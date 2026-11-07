@@ -149,14 +149,14 @@ textarea:focus{border-color:var(--sky);outline:none;background:#fff}
 .mx-wrap{width:min(1320px,100%);margin:auto;display:flex;flex-direction:column;gap:12px}
 .mx{width:100%;border-collapse:separate;border-spacing:5px;background:var(--card);border-radius:24px;box-shadow:var(--sh);padding:12px;table-layout:fixed}
 .mx th{font-family:var(--dsp);font-weight:600;font-size:clamp(13px,1.1vw,17px);color:var(--muted);padding:6px 4px;text-align:center;vertical-align:bottom}
-.mx th:first-child{width:23%}.mx th:last-child{width:15%}
+.mx th:first-child{width:21%}.mx th:last-child{width:19%}
 .mx th.warn{color:var(--rt)}
 .mx th small{display:block;font-family:var(--txt);font-size:12px;font-weight:700;color:var(--r);margin-top:2px}
 .mx td.pf{font-family:var(--dsp);font-weight:600;font-size:clamp(14px,1.15vw,18px);line-height:1.15;padding:2px 10px;overflow-wrap:anywhere}
 .mx td.c{height:clamp(30px,3.9vh,48px);border-radius:12px;text-align:center;font-family:var(--dsp);font-weight:700;font-size:clamp(16px,1.4vw,22px);background:var(--bg);color:var(--navy);transition:background .5s,color .5s}
 .mx td.c.top{box-shadow:inset 0 0 0 3px var(--y)}
 .mx td.res{text-align:center}
-.mx td.res span{display:inline-block;font-size:13px;font-weight:700;border-radius:999px;padding:6px 11px;white-space:nowrap}
+.mx td.res span{display:inline-block;font-size:13px;font-weight:700;border-radius:12px;padding:6px 11px;line-height:1.25}
 .mx td.res .ok{background:var(--gs);color:var(--gt)}.mx td.res .dv{background:var(--ys);color:var(--yt)}.mx td.res .no{background:var(--bg);color:var(--muted)}
 /* dock */
 .dock{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:#fff;border-radius:20px;box-shadow:0 10px 34px rgba(16,32,60,.18);padding:8px;z-index:10;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
@@ -287,13 +287,13 @@ textarea:focus{border-color:var(--sky);outline:none;background:#fff}
 
 <form class="m-body" id="mv-roles" hidden>
 <div class="card">
-<div class="label">¿Cuál es el trabajo principal de cada perfil?</div>
+<div class="label">¿Qué trabajo hace cada perfil?</div>
 <div id="rl-list"></div>
 </div>
 <button class="send" id="rl-send" type="submit" disabled>Marca al menos uno</button>
 <div class="msg ok" id="rl-ok" hidden>¡Enviado! Puedes cambiarlo y reenviar.</div>
 <div class="msg err" id="rl-err" hidden>No se ha podido enviar. Inténtalo otra vez.</div>
-<p class="hint">Si no conoces un perfil, déjalo sin marcar.</p>
+<p class="hint">Puedes marcar varios por perfil: elige solo los principales. Si no conoces un perfil, déjalo en blanco.</p>
 </form>
 
 <form class="m-body" id="mv-manana" autocomplete="off" hidden>
@@ -428,7 +428,7 @@ const ROL_LBL=Object.fromEntries(ROLES);
 const PERFILES_DEF=["Facebook","Instagram","X","YouTube","TikTok","LinkedIn","WhatsApp / Telegram"];
 const OPC_CRE={verdadero:["Verdadero","var(--g)"],falso:["Falso","var(--r)"],yano:["Ya no","var(--y)"]};
 const TITLES={muro:"¿Qué nos frena?",creencias:"Juego de creencias",semaforo:"Semáforo de tendencias",roles:"¿Qué trabajo hace cada perfil?",manana:"Mañana haré…",espera:"Taller de redes"};
-const SUBS={muro:"Escanea el código y responde desde tu móvil",creencias:"Vota desde tu móvil: verdadero, falso o ya no",semaforo:"Clasifica cada tendencia desde tu móvil",roles:"Marca desde tu móvil el trabajo principal de cada perfil",manana:"Escribe tu compromiso desde el móvil"};
+const SUBS={muro:"Escanea el código y responde desde tu móvil",creencias:"Vota desde tu móvil: verdadero, falso o ya no",semaforo:"Clasifica cada tendencia desde tu móvil",roles:"Marca desde tu móvil qué trabajo hace cada perfil (puedes marcar varios)",manana:"Escribe tu compromiso desde el móvil"};
 const ORDER=["muro","creencias","semaforo","roles","manana"];
 let votante=null;
 try{votante=localStorage.getItem("taller_votante");if(!votante){votante="v"+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem("taller_votante",votante);}}catch(e){votante="v"+Math.random().toString(36).slice(2)+Date.now().toString(36);}
@@ -450,7 +450,7 @@ $("mobile").hidden=false;
 $("m-pill").textContent=salaLabel[sala]||"Anónimo";
 let est={actividad:null,item:-1,revelar:false};
 const views=["espera","muro","creencias","semaforo","roles","manana"];
-const MSUB={muro:"Anónimo · una idea por envío",creencias:"Elige una opción · puedes cambiarla",semaforo:"Marca las seis y envía",roles:"Un trabajo por perfil · anónimo",manana:"Un compromiso concreto para mañana",espera:"Sin registro · tu respuesta es anónima"};
+const MSUB={muro:"Anónimo · una idea por envío",creencias:"Elige una opción · puedes cambiarla",semaforo:"Marca las seis y envía",roles:"Puedes marcar varios · anónimo",manana:"Un compromiso concreto para mañana",espera:"Sin registro · tu respuesta es anónima"};
 function show(a){views.forEach(v=>$("mv-"+v).hidden=(v!==a));$("m-title").textContent=TITLES[a]||"Taller de redes";$("m-sub").textContent=MSUB[a]||"";window.scrollTo(0,0);}
 let tipo=null;
 const mupd=()=>{$("muro-send").disabled=!(tipo&&$("muro-txt").value.trim());$("muro-count").textContent=$("muro-txt").value.length+" / 200";};
@@ -491,24 +491,25 @@ $("mv-semaforo").addEventListener("submit",async e=>{e.preventDefault();$("sem-s
 for(const [i,v] of Object.entries(semSel)){const {error}=await sb.rpc("votar",{p_sala:sala,p_act:"semaforo",p_item:+i,p_opcion:v,p_votante:votante});if(error)bad=true;}
 $("sem-send").disabled=false;$("sem-send").textContent="Enviar mi semáforo";$("sem-err").hidden=!bad;$("sem-ok").hidden=bad;});
 let perfs=[],rlSel={};
-try{rlSel=JSON.parse(sessionStorage.getItem("rol_"+sala)||"{}")||{};}catch(e){rlSel={};}
-function rlUpd(){const n=perfs.filter(p=>rlSel[p]).length;$("rl-send").disabled=!n;$("rl-send").textContent=n?("Enviar ("+n+" de "+perfs.length+")"):"Marca al menos uno";}
+try{rlSel=JSON.parse(sessionStorage.getItem("rol2_"+sala)||"{}")||{};}catch(e){rlSel={};}
+const rlHas=p=>Array.isArray(rlSel[p])&&rlSel[p].length>0;
+function rlUpd(){const n=perfs.filter(rlHas).length;$("rl-send").disabled=!n;$("rl-send").textContent=n?("Enviar ("+n+" de "+perfs.length+")"):"Marca al menos uno";}
 function paintRoles(){
 const host=$("rl-list");host.textContent="";
 perfs.forEach(p=>{
 const d=document.createElement("div");d.className="rl-row";
 const b=document.createElement("b");b.textContent=p;d.appendChild(b);
 const o=document.createElement("div");o.className="rl-opts";
-ROLES.forEach(([k,l])=>{const x=document.createElement("button");x.type="button";x.textContent=l;x.setAttribute("aria-pressed",String(rlSel[p]===k));
-x.addEventListener("click",()=>{rlSel[p]=k;o.querySelectorAll("button").forEach(y=>y.setAttribute("aria-pressed",String(y===x)));$("rl-ok").hidden=$("rl-err").hidden=true;rlUpd();});
+ROLES.forEach(([k,l])=>{const x=document.createElement("button");x.type="button";x.textContent=l;x.setAttribute("aria-pressed",String(rlHas(p)&&rlSel[p].includes(k)));
+x.addEventListener("click",()=>{const cur=Array.isArray(rlSel[p])?rlSel[p]:[];rlSel[p]=cur.includes(k)?cur.filter(z=>z!==k):cur.concat(k);x.setAttribute("aria-pressed",String(rlSel[p].includes(k)));$("rl-ok").hidden=$("rl-err").hidden=true;rlUpd();});
 o.appendChild(x);});
 d.appendChild(o);host.appendChild(d);
 });
 rlUpd();
 }
 $("mv-roles").addEventListener("submit",async e=>{e.preventDefault();$("rl-send").disabled=true;$("rl-send").textContent="Enviando…";let bad=false;
-for(const p of perfs){if(!rlSel[p])continue;const {error}=await sb.rpc("votar_rol",{p_sala:sala,p_perfil:p,p_rol:rlSel[p],p_votante:votante});if(error)bad=true;}
-try{sessionStorage.setItem("rol_"+sala,JSON.stringify(rlSel));}catch(e){}
+for(const p of perfs){if(!(p in rlSel))continue;const {error}=await sb.rpc("votar_roles",{p_sala:sala,p_perfil:p,p_roles:rlHas(p)?rlSel[p]:[],p_votante:votante});if(error)bad=true;}
+try{sessionStorage.setItem("rol2_"+sala,JSON.stringify(rlSel));}catch(e){}
 rlUpd();$("rl-err").hidden=!bad;$("rl-ok").hidden=bad;});
 const nupd=()=>{$("man-send").disabled=!$("man-txt").value.trim();$("man-count").textContent=$("man-txt").value.length+" / 200";};
 $("man-txt").addEventListener("input",()=>{$("man-ok").hidden=$("man-err").hidden=true;nupd();});
@@ -616,32 +617,33 @@ const vs=votes.filter(v=>perfs.includes(v.perfil));
 const voters=new Set(vs.map(v=>v.votante)).size;
 const rev=est.revelar;
 const stats=perfs.map(p=>{const it=vs.filter(v=>v.perfil===p);const n={};ROLES.forEach(([k])=>n[k]=0);it.forEach(v=>n[v.rol]++);
-const tot=it.length;let top=null,mx=0,tie=false;ROLES.forEach(([k])=>{if(n[k]>mx){mx=n[k];top=k;tie=false;}else if(n[k]===mx&&mx>0)tie=true;});
-return {p,n,tot,top:tie?null:top,share:tot?mx/tot:0};});
-const dup={};stats.forEach(s=>{if(s.top)dup[s.top]=(dup[s.top]||0)+1;});
+const tot=new Set(it.map(v=>v.votante)).size;
+const main=tot?ROLES.map(r=>r[0]).filter(k=>n[k]/tot>=0.5):[];
+return {p,n,tot,main};});
+const dup={};stats.forEach(s=>s.main.forEach(k=>{dup[k]=(dup[k]||0)+1;}));
 const t=$("mx");t.textContent="";
 const hr=document.createElement("tr");
 const h0=document.createElement("th");h0.textContent="Perfil";h0.style.textAlign="left";h0.style.paddingLeft="10px";hr.appendChild(h0);
 ROLES.forEach(([k,l])=>{const th=document.createElement("th");th.textContent=l;if(rev&&dup[k]>1){th.className="warn";const sm=document.createElement("small");sm.textContent="⚠ "+dup[k]+" perfiles";th.appendChild(sm);}hr.appendChild(th);});
-const hl=document.createElement("th");hl.textContent=rev?"Resultado":"Votos";hr.appendChild(hl);
+const hl=document.createElement("th");hl.textContent=rev?"Trabajo principal":"Han votado";hr.appendChild(hl);
 const th0=document.createElement("thead");th0.appendChild(hr);t.appendChild(th0);
 const tb=document.createElement("tbody");
 stats.forEach(s=>{
 const tr=document.createElement("tr");
 const td=document.createElement("td");td.className="pf";td.textContent=s.p;td.title=s.p;tr.appendChild(td);
 ROLES.forEach(([k])=>{const c=document.createElement("td");c.className="c";
-if(rev&&s.tot&&s.n[k]){const a=s.n[k]/s.tot;c.style.background="rgba(0,54,96,"+(0.12+0.88*a).toFixed(2)+")";c.style.color=a>0.4?"#fff":"var(--navy)";c.textContent=s.n[k];if(k===s.top)c.classList.add("top");}
+if(rev&&s.tot&&s.n[k]){const a=s.n[k]/s.tot;c.style.background="rgba(0,54,96,"+(0.12+0.88*a).toFixed(2)+")";c.style.color=a>0.4?"#fff":"var(--navy)";c.textContent=s.n[k];if(s.main.includes(k))c.classList.add("top");}
 tr.appendChild(c);});
 const r=document.createElement("td");r.className="res";const sp=document.createElement("span");
-if(!rev){sp.className="no";sp.textContent=s.tot+(s.tot===1?" voto":" votos");}
+if(!rev){sp.className="no";sp.textContent=s.tot+(s.tot===1?" persona":" personas");}
 else if(!s.tot){sp.className="no";sp.textContent="Sin votos";}
-else if(s.top&&s.share>=0.6){sp.className="ok";sp.textContent="Claro: "+ROL_LBL[s.top];}
+else if(s.main.length){sp.className="ok";sp.textContent=s.main.map(k=>ROL_LBL[k]).join(" + ");}
 else{sp.className="dv";sp.textContent="Opiniones divididas";}
 r.appendChild(sp);tr.appendChild(r);tb.appendChild(tr);
 });
 t.appendChild(tb);
 const lg=$("mx-leg");lg.textContent="";
-const items=rev?["Más oscuro = más gente lo ve así","Recuadro amarillo = lo más votado","⚠ = varios perfiles hacen el mismo trabajo"]:["Resultados ocultos hasta pulsar Revelar"];
+const items=rev?["Más oscuro = más gente lo ve así","Recuadro amarillo = lo marca la mitad o más","⚠ = varios perfiles hacen el mismo trabajo"]:["Resultados ocultos hasta pulsar Revelar"];
 items.concat([voters+(voters===1?" persona ha votado":" personas han votado")]).forEach(x=>{const e=document.createElement("span");e.textContent=x;lg.appendChild(e);});
 }
 function render(){
@@ -664,7 +666,7 @@ if(a==="muro"){({data,error}=await sb.from("respuestas").select("id,tipo,texto,g
 else{({data,error}=await sb.from("manana").select("id,texto,grupo,created_at").eq("sala",sala).order("created_at",{ascending:true}).limit(500));if(data)data=data.map(r=>({...r,tipo:"manana"}));}
 if(error)throw error; const sig=a+JSON.stringify(data); if(sig!==load._sig){load._sig=sig;rows=data;render();}
 }else if(a==="roles"){
-let p;[p,{data,error}]=await Promise.all([getPerfiles(),sb.from("roles_votos").select("perfil,rol,votante").eq("sala",sala).limit(3000)]);
+let p;[p,{data,error}]=await Promise.all([getPerfiles(),sb.from("roles_marcas").select("perfil,rol,votante").eq("sala",sala).limit(3000)]);
 if(error)throw error; const sig=a+est.revelar+JSON.stringify(p)+JSON.stringify(data); if(sig!==load._sig){load._sig=sig;perfs=p;votes=data;render();}
 }else{
 ({data,error}=await sb.from("votos").select("actividad,item,opcion,votante").eq("sala",sala).eq("actividad",a).limit(2000));
@@ -676,7 +678,7 @@ $("live").classList.remove("off");
 let chans=[];
 function subscribe(){
 chans.forEach(c=>sb.removeChannel(c));
-chans=["respuestas","manana","votos","estado","modo_roles","roles_votos","perfiles_sala"].map(t=>sb.channel("p-"+t+"-"+sala).on("postgres_changes",{event:"*",schema:"public",table:t,filter:"sala=eq."+sala},()=>load()).subscribe());
+chans=["respuestas","manana","votos","estado","modo_roles","roles_marcas","perfiles_sala"].map(t=>sb.channel("p-"+t+"-"+sala).on("postgres_changes",{event:"*",schema:"public",table:t,filter:"sala=eq."+sala},()=>load()).subscribe());
 }
 function setSala(s){sala=clean(s);seen=new Set();first=true;load._sig=null;const u=new URL(location.href);u.searchParams.set("sala",sala);history.replaceState(null,"",u);drawQR();paintFrame();load();subscribe();}
 $("sala").addEventListener("change",e=>setSala(e.target.value));
