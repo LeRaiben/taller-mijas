@@ -147,6 +147,18 @@ textarea:focus{border-color:var(--sky);outline:none;background:#fff}
 .rl-opts button:active{transform:scale(.97)}
 .rl-opts button[aria-pressed="true"]{background:var(--navy);color:#fff;box-shadow:0 4px 12px rgba(0,54,96,.25)}
 .mx-wrap{width:min(1320px,100%);margin:auto;display:flex;flex-direction:column;gap:12px}
+.mx-box{display:flex;flex-direction:column}
+#pv-roles .mx-wrap{margin:clamp(12px,5vh,64px) auto auto}
+.mx-tabs{display:flex;justify-content:flex-end;gap:6px;padding:0 26px}
+.mx-tabs button{border-radius:14px 14px 0 0;padding:11px 22px 13px;font-family:var(--dsp);font-weight:600;font-size:clamp(14px,1.1vw,17px);background:#dfe6ef;color:var(--muted);display:flex;align-items:center;gap:9px;transition:background .15s,color .15s}
+.mx-tabs button:hover{color:var(--navy)}
+.mx-tabs button[aria-selected="true"]{background:var(--card);color:var(--navy);box-shadow:0 -6px 14px rgba(16,32,60,.06)}
+.mx-tabs button small{font-family:var(--txt);font-size:12px;font-weight:700;background:var(--bg);color:var(--muted);border-radius:999px;padding:2px 8px}
+.mx-tabs button[aria-selected="true"] small{background:var(--ice);color:var(--navy)}
+.mx-box .mx{border-top-right-radius:8px}
+.rl-sec{font-family:var(--dsp);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:18px 0 4px;border-top:2px solid var(--line)}
+.rl-sec:first-child{padding-top:0;border-top:0}
+.rl-sec+.rl-row{border-top:0}
 .mx{width:100%;border-collapse:separate;border-spacing:5px;background:var(--card);border-radius:24px;box-shadow:var(--sh);padding:12px;table-layout:fixed}
 .mx th{font-family:var(--dsp);font-weight:600;font-size:clamp(13px,1.1vw,17px);color:var(--muted);padding:6px 4px;text-align:center;vertical-align:bottom}
 .mx th:first-child{width:21%}.mx th:last-child{width:19%}
@@ -345,7 +357,7 @@ textarea:focus{border-color:var(--sky);outline:none;background:#fff}
 </section>
 
 <section id="pv-roles" style="display:flex;flex:1" hidden>
-<div class="mx-wrap"><table class="mx" id="mx"></table><div class="leg" id="mx-leg"></div></div>
+<div class="mx-wrap"><div class="mx-box"><div class="mx-tabs" id="mx-tabs" role="tablist" aria-label="Tipo de perfil"><button type="button" role="tab" data-t="redes" aria-selected="true">Redes sociales <small id="mx-n-redes"></small></button><button type="button" role="tab" data-t="ig" aria-selected="false">Instagram <small id="mx-n-ig"></small></button></div><table class="mx" id="mx"></table></div><div class="leg" id="mx-leg"></div></div>
 </section>
 
 <section id="pv-manana" class="col b" style="flex:1" hidden>
@@ -425,6 +437,8 @@ const CREENCIAS=[
 const TENDENCIAS=["Vídeo vertical","Búsqueda en redes","Canales de difusión","Contenido de servicio","Carruseles","Comunidades locales"];
 const ROLES=[["ultima","Última hora"],["comunidad","Comunidad"],["servicio","Servicio"],["descubrir","Descubrir"],["institucional","Institucional"],["archivo","Archivo"]];
 const ROL_LBL=Object.fromEntries(ROLES);
+const isIG=p=>/^\s*instagram\b/i.test(p);
+const igLabel=p=>p.replace(/^\s*instagram\s*/i,"")||p;
 const PERFILES_DEF=["Facebook","Instagram @mijas.semanal","Instagram @mijas340tv","Instagram @radiomijas","X","YouTube","TikTok","LinkedIn","WhatsApp / Telegram"];
 const OPC_CRE={verdadero:["Verdadero","var(--g)"],falso:["Falso","var(--r)"],yano:["Ya no","var(--y)"]};
 const TITLES={muro:"¿Qué nos frena?",creencias:"Juego de creencias",semaforo:"Semáforo de tendencias",roles:"¿Qué trabajo hace cada perfil?",manana:"Mañana haré…",espera:"Taller de redes"};
@@ -496,7 +510,9 @@ const rlHas=p=>Array.isArray(rlSel[p])&&rlSel[p].length>0;
 function rlUpd(){const n=perfs.filter(rlHas).length;$("rl-send").disabled=!n;$("rl-send").textContent=n?("Enviar ("+n+" de "+perfs.length+")"):"Marca al menos uno";}
 function paintRoles(){
 const host=$("rl-list");host.textContent="";
-perfs.forEach(p=>{
+const grpR=perfs.filter(p=>!isIG(p)),grpI=perfs.filter(isIG),split=grpR.length&&grpI.length;
+grpR.concat(grpI).forEach((p,i)=>{
+if(split&&(i===0||i===grpR.length)){const h=document.createElement("div");h.className="rl-sec";h.textContent=i===0?"Redes sociales":"Perfiles de Instagram";host.appendChild(h);}
 const d=document.createElement("div");d.className="rl-row";
 const b=document.createElement("b");b.textContent=p;d.appendChild(b);
 const o=document.createElement("div");o.className="rl-opts";
@@ -612,25 +628,33 @@ host.appendChild(r);
 });
 $("ps-total").textContent="· "+voters+(voters===1?" persona ha votado":" personas han votado");
 }
+let rlTab="redes";
+document.querySelectorAll("#mx-tabs button").forEach(b=>b.addEventListener("click",()=>{rlTab=b.dataset.t;renderRoles();}));
 function renderRoles(){
 const vs=votes.filter(v=>perfs.includes(v.perfil));
 const voters=new Set(vs.map(v=>v.votante)).size;
 const rev=est.revelar;
-const stats=perfs.map(p=>{const it=vs.filter(v=>v.perfil===p);const n={};ROLES.forEach(([k])=>n[k]=0);it.forEach(v=>n[v.rol]++);
+const pR=perfs.filter(p=>!isIG(p)),pI=perfs.filter(isIG),split=pR.length&&pI.length;
+if(!split)rlTab="redes";
+$("mx-tabs").hidden=!split;
+$("mx-n-redes").textContent=pR.length;$("mx-n-ig").textContent=pI.length;
+document.querySelectorAll("#mx-tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.t===rlTab)));
+const shown=!split?perfs:(rlTab==="ig"?pI:pR);
+const stats=shown.map(p=>{const it=vs.filter(v=>v.perfil===p);const n={};ROLES.forEach(([k])=>n[k]=0);it.forEach(v=>n[v.rol]++);
 const tot=new Set(it.map(v=>v.votante)).size;
 const main=tot?ROLES.map(r=>r[0]).filter(k=>n[k]/tot>=0.5):[];
 return {p,n,tot,main};});
 const dup={};stats.forEach(s=>s.main.forEach(k=>{dup[k]=(dup[k]||0)+1;}));
 const t=$("mx");t.textContent="";
 const hr=document.createElement("tr");
-const h0=document.createElement("th");h0.textContent="Perfil";h0.style.textAlign="left";h0.style.paddingLeft="10px";hr.appendChild(h0);
+const h0=document.createElement("th");h0.textContent=(split&&rlTab==="ig")?"Perfil de Instagram":"Perfil";h0.style.textAlign="left";h0.style.paddingLeft="10px";hr.appendChild(h0);
 ROLES.forEach(([k,l])=>{const th=document.createElement("th");th.textContent=l;if(rev&&dup[k]>1){th.className="warn";const sm=document.createElement("small");sm.textContent="⚠ "+dup[k]+" perfiles";th.appendChild(sm);}hr.appendChild(th);});
 const hl=document.createElement("th");hl.textContent=rev?"Trabajo principal":"Han votado";hr.appendChild(hl);
 const th0=document.createElement("thead");th0.appendChild(hr);t.appendChild(th0);
 const tb=document.createElement("tbody");
 stats.forEach(s=>{
 const tr=document.createElement("tr");
-const td=document.createElement("td");td.className="pf";td.textContent=s.p;td.title=s.p;tr.appendChild(td);
+const td=document.createElement("td");td.className="pf";td.textContent=(split&&rlTab==="ig")?igLabel(s.p):s.p;td.title=s.p;tr.appendChild(td);
 ROLES.forEach(([k])=>{const c=document.createElement("td");c.className="c";
 if(rev&&s.tot&&s.n[k]){const a=s.n[k]/s.tot;c.style.background="rgba(0,54,96,"+(0.12+0.88*a).toFixed(2)+")";c.style.color=a>0.4?"#fff":"var(--navy)";c.textContent=s.n[k];if(s.main.includes(k))c.classList.add("top");}
 tr.appendChild(c);});
